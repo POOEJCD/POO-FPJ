@@ -1,1 +1,102 @@
+@startuml
+skinparam classAttributeIconSize 0
 
+' === Interfaces ===
+interface Prestable {
+    +prestar(): boolean
+    +devolver(): boolean
+}
+
+interface Renovable {
+    +renovar(): boolean
+}
+
+interface Reservable {
+    +reservar(): boolean
+}
+
+' === Clases de Usuario ===
+abstract class Usuario {
+    - id: String
+    - nombre: String
+    - email: String
+    - contrasena: String
+    + getId(): String
+    + getNombre(): String
+    + getEmail(): String
+    + setEmail(email: String): void
+    + autenticar(contrasena: String): boolean
+    + obtenerLimitePrestamo(): int
+}
+
+class Estudiante
+class Profesor
+
+Usuario <|-- Estudiante
+Usuario <|-- Profesor
+
+' === Clases de Material ===
+abstract class Material {
+    - titulo: String
+    - codigo: String
+    - disponible: boolean
+    + getTitulo(): String
+    + getCodigo(): String
+    + estaDisponible(): boolean
+    + obtenerTipo(): String
+}
+
+class Libro {
+    - autor: String
+}
+class LibroEspecializado {
+    - especialidad: String
+}
+
+Material <|-- Libro
+Libro <|-- LibroEspecializado
+
+Libro ..|> Prestable
+Libro ..|> Reservable
+Libro ..|> Renovable
+
+' === Clase Prestamo ===
+class Prestamo {
+    - usuario: Usuario
+    - material: Material
+    - fechaPrestamo: LocalDate
+    - fechaDevolucion: LocalDate
+    - multa: Multa
+    + devolver(LocalDate): void
+    + getMulta(): Multa
+}
+
+Prestamo --> Usuario : usuario
+Prestamo --> Material : material
+Prestamo --> Multa : multa
+
+' === Clase Multa ===
+class Multa {
+    - monto: double
+    - pagada: boolean
+    + pagar(): void
+    + estaPagada(): boolean
+    + getMonto(): double
+    + toString(): String
+}
+
+' === Clase BibliotecaDB ===
+class BibliotecaDB {
+    - usuarios: List<Usuario>
+    - materiales: List<Material>
+    - prestamos: List<Prestamo>
+    + agregarUsuario(u: Usuario): void
+    + agregarMaterial(m: Material): void
+    + registrarPrestamo(p: Prestamo): void
+}
+
+BibliotecaDB --> Usuario
+BibliotecaDB --> Material
+BibliotecaDB --> Prestamo
+
+@enduml
